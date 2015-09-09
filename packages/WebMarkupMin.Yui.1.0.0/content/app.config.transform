@@ -1,0 +1,21 @@
+<configuration>
+	<configSections>
+		<sectionGroup name="webMarkupMin">
+			<section name="yui" type="WebMarkupMin.Yui.Configuration.YuiConfiguration, WebMarkupMin.Yui" />
+		</sectionGroup>
+	</configSections>
+	<webMarkupMin xmlns="http://tempuri.org/WebMarkupMin.Configuration.xsd">
+		<core>
+			<css>
+				<minifiers>
+					<add name="YuiCssMinifier" displayName="YUI CSS Minifier" type="WebMarkupMin.Yui.Minifiers.YuiCssMinifier, WebMarkupMin.Yui" />
+				</minifiers>
+			</css>
+			<js>
+				<minifiers>
+					<add name="YuiJsMinifier" displayName="YUI JS Minifier" type="WebMarkupMin.Yui.Minifiers.YuiJsMinifier, WebMarkupMin.Yui" />
+				</minifiers>
+			</js>
+		</core>
+	</webMarkupMin>
+</configuration>
