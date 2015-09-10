@@ -11,13 +11,13 @@ AsmDiff.NET is able to scan for
 - Changes
   * Renamed properties
   * Changed datatypes
- - Deletions
-   * Removed classes
-   * Removed properties
+- Deletions
+  * Removed classes
+  * Removed properties
 
 ## Install
 The application is a single binary file and a folder containing the HTML template.
-\
+
 You can find the latest release under the release tab above.
 
 ## Build dependencies
@@ -31,9 +31,9 @@ If neither of the default ones satisfies your needs, you are able to create your
 
 Examples of the HTML reports
 
-[DARK](https://github.com/KLIM8D/AsmDiff.NET/example-report-dark.gif)
+[DARK](https://github.com/KLIM8D/AsmDiff.NET/master/example-report-dark.gif)
 
-[LIGHT](https://github.com/KLIM8D/AsmDiff.NET/example-report-light.gif)
+[LIGHT](https://github.com/KLIM8D/AsmDiff.NET/master/example-report-light.gif)
 
 
 ## Usage
