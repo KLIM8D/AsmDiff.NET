@@ -31,9 +31,9 @@ If neither of the default ones satisfies your needs, you are able to create your
 
 Examples of the HTML reports
 
-[DARK](https://github.com/KLIM8D/AsmDiff.NET/master/example-report-dark.gif)
+[DARK](https://raw.githubusercontent.com/KLIM8D/AsmDiff.NET/master/example-report-dark.gif)
 
-[LIGHT](https://github.com/KLIM8D/AsmDiff.NET/master/example-report-light.gif)
+[LIGHT](https://raw.githubusercontent.com/KLIM8D/AsmDiff.NET/master/example-report-light.gif)
 
 
 ## Usage
