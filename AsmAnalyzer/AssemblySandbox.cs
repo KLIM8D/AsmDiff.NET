@@ -5,6 +5,7 @@ Copyright (c) 2015 Morten Klim Sørensen
 See LICENSE.txt for more information
 */
 #endregion
+using AsmAnalyzer.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -159,10 +160,9 @@ namespace AsmAnalyzer
         /// <param name="assemblies">A list containing the system path for all the assemblies in the domain</param>
         /// <param name="func">The anonymous function</param>
         /// <returns>A DataStore object which holds the information return by `func`</returns>
-        public DataStore Reflect(List<string> assemblies, Func<Assembly, Type, DataStore> func)
+        public DataStore Reflect(List<string> assemblies, AssemblyMetaData metaData, Func<Assembly, Type, DataStore> func)
         {
             var r = new DataStore { Data = new Dictionary<string, Util.CommonObject>() };
-            var errors = new List<string>();
             foreach (var assemblyPath in assemblies)
             {
                 // check if the assembly is found in the internal dictionaries
@@ -176,11 +176,12 @@ namespace AsmAnalyzer
                             if (!r.Data.ContainsKey(item.Key))
                                 r.Data.Add(item.Key, item.Value);
                         }
+                        metaData.AssemblySuccess.Add(assemblyPath);
                     }
                     catch (FileNotFoundException)
                     {
                         //errors here usually occurs when the application is unable to locate an assemblys dependencies or an dependency, dependencies
-                        errors.Add(assemblyPath);
+                        metaData.AssemblyErrors.Add(assemblyPath);
                     }
                 }
             }

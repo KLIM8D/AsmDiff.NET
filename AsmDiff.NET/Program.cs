@@ -28,6 +28,7 @@ namespace AsmDiff.NET
             string pattern = "";
             string flags   = "";
             string theme   = "light";
+            string title   = "AsmDiff.NET report";
 
             bool isHtml   = true;
             bool showHelp = false;
@@ -47,7 +48,8 @@ namespace AsmDiff.NET
                             "Default: `flags=cd`", fl => flags = fl },
                 {"theme=", "specify either a filename within Assets\\Themes or a path to a CSS file. " + Environment.NewLine +
                             "Default options: light, dark" + Environment.NewLine +
-                            "Default: `theme=light`", th => theme = th}
+                            "Default: `theme=light`", th => theme = th},
+                {"title=", "the given title will be displayed at the top of the HTML report", t => { if(!String.IsNullOrEmpty(t)) title = t; } }
             };
 
 
@@ -88,14 +90,21 @@ namespace AsmDiff.NET
 
                 #endregion
 
+                var metaData = new MetaData
+                {
+                    Pattern = pattern,
+                    Filter = filter,
+                    Source = new AssemblyMetaData { Path = source, AssemblyErrors = new List<string>(), AssemblySuccess = new List<string>() },
+                    Target = new AssemblyMetaData { Path = target, AssemblyErrors = new List<string>(), AssemblySuccess = new List<string>() }
+                };
                 var analyzer = new Analyzer { Flags = fl };
-                var s = analyzer.Invoke(@source, @target, @filter, regex);
+                var s = analyzer.Invoke(@source, @target, @filter, regex, metaData);
 
                 #region RenderOutput
                 // is the outputformat HTML or not
                 if (isHtml)
                 {
-                    var htmlHelper = new HtmlHelper(theme);
+                    var htmlHelper = new HtmlHelper(theme, title);
                     var html = htmlHelper.RenderHTML(s);
                     using (var fileStream = File.Create(String.Format(@"{0}\AssemblyScanReport-{1}.html", Environment.CurrentDirectory, DateTime.Now.ToString("dd-MM-yyyy_HH-mm"))))
                     {

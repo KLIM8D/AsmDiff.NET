@@ -69,7 +69,7 @@ namespace AsmAnalyzer
         /// <param name="target">This is the NEW version of the library. Either a path to a specific assembly or a folder which contains assemblies</param>
         /// <param name="filter">Specify a filter, which will exclude all other classes, than the one specified in the filter. Must be the class name including the namespace (eg. System.Reflection.Assembly)</param>
         /// <returns>The difference between the assemblies in `source` and `target`</returns>
-        public ICollection<Result> Invoke(string source, string target, string filter, Regex pattern)
+        public ICollection<Result> Invoke(string source, string target, string filter, Regex pattern, MetaData metaData)
         {
             var sourceSandbox = new AssemblySandbox();
             var sourceAssemblies = Setup(sourceSandbox, source, filter, "SourceSandbox", pattern);
@@ -220,7 +220,7 @@ namespace AsmAnalyzer
                         // go through each item in `source` and check if there are any differences between source and targets properties
                         foreach (var srcProp in sourceItem.Value.Properties)
                         {
-                            var tarProp = targetItem.Properties.FirstOrDefault(x => x.Name.Equals(srcProp.Name) && x.PropertyType.Equals(srcProp.PropertyType));
+                            var tarProp = targetItem.Properties.FirstOrDefault(x => x.Name.Equals(srcProp.Name));
                             ResultType rt = ResultType.Unchanged;
                             if (tarProp == null)
                             {
@@ -248,25 +248,28 @@ namespace AsmAnalyzer
 
                         // get all the items which either have been renamed or removed, and therefore couldn't be resolved in the first loop
                         var unresolvedTarItems = targetItem.Properties.Where(x => { CommonProperty y; return !tarKnownItems.TryGetValue(x.ToString(), out y); }).ToList();
-                        foreach (var srcProp in srcUnknownItems.Values)
+                        if (inclDeletions)
                         {
-                            // look up the item by it's datatype
-                            var tarProp = unresolvedTarItems.FirstOrDefault(x => { CommonProperty y; return x.PropertyType.Equals(srcProp.PropertyType)
-                                                                                   && !tarKnownItems.TryGetValue(x.ToString(), out y); });
-                            if (tarProp != null)
+                            foreach (var srcProp in srcUnknownItems.Values)
                             {
-                                if (inclChanges)
-                                {
-                                    var r = NewResultItem(srcProp, tarProp, ResultType.Change);
-                                    result.Items.Add(r);
-                                }
+                                // look up the item by it's datatype
+                                //var tarProp = unresolvedTarItems.FirstOrDefault(x => { CommonProperty y; return x.PropertyType.Equals(srcProp.PropertyType)
+                                //                                                       && !tarKnownItems.TryGetValue(x.ToString(), out y); });
+                                //if (tarProp != null)
+                                //{
+                                //    if (inclChanges)
+                                //    {
+                                //        var r = NewResultItem(srcProp, tarProp, ResultType.Change);
+                                //        result.Items.Add(r);
+                                //    }
 
-                                tarKnownItems.Add(tarProp.ToString(), tarProp);
-                            }
-                            else if (inclDeletions)
-                            {
-                                var r = NewResultItem(srcProp, null, ResultType.Deletion);
-                                result.Items.Add(r);
+                                //    tarKnownItems.Add(tarProp.ToString(), tarProp);
+                                //}
+                                //else if (inclDeletions)
+                                //{
+                                    var r = NewResultItem(srcProp, null, ResultType.Deletion);
+                                    result.Items.Add(r);
+                                //}
                             }
                         }
 

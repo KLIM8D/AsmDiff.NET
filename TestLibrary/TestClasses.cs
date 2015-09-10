@@ -6,7 +6,7 @@ namespace TestLibrary
     public class Address
     {
         public string Street { get; set; }
-        public Int16 ZipCode { get; set; }
+        public Int16? ZipCode { get; set; }
         public string City { get; set; }
 
     }
@@ -33,7 +33,7 @@ namespace TestLibrary
     public class Nursery
     {
         public string Name { get; set; }
-        public NurseryType Type { get; set; }
+        public NurseryType? Type { get; set; }
     }
 
     public enum NurseryType

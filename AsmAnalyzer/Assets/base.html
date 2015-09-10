@@ -3,10 +3,11 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>AsmDiff.NET report {{DATE}}</title>
+    <title>{{TITLE}} {{DATE}}</title>
     <style>{{CSS}}</style>
 </head>
 <body>
+    <h1>{{TITLE}}</h1>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () { $(".boxed").on("click", ".btn", function () { var b = $(this); var a = b.parent().children(".changes-table").children("tbody"); var c = a.children("tr"); if (a.hasClass("collapsed")) { a.removeClass("collapsed"); c.show(); b.text("- [hide]") } else { b.text("+ [" + (c.length - 1) + " entries]"); a.addClass("collapsed"); c.hide() } }) });
