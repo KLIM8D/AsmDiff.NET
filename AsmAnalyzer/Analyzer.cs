@@ -74,7 +74,7 @@ namespace AsmAnalyzer
             var sourceSandbox = new AssemblySandbox();
             var sourceAssemblies = Setup(sourceSandbox, source, filter, "SourceSandbox", pattern);
 
-            var sourceDataStore = sourceSandbox.Reflect(sourceAssemblies, (asm, f) =>
+            var sourceDataStore = sourceSandbox.Reflect(sourceAssemblies, metaData.Source, (asm, f) =>
             {
                 var ds = new DataStore { Data = new Dictionary<string, CommonObject>() };
                 var a = new Analyzer();
@@ -86,7 +86,7 @@ namespace AsmAnalyzer
             var targetSandbox = new AssemblySandbox();
             var targetAssemblies = Setup(targetSandbox, target, filter, "TargetSandbox", pattern);
 
-            var targetDataStore = targetSandbox.Reflect(targetAssemblies, (asm, f) =>
+            var targetDataStore = targetSandbox.Reflect(targetAssemblies, metaData.Target, (asm, f) =>
             {
                 var ds = new DataStore { Data = new Dictionary<string, CommonObject>() };
                 var a = new Analyzer();

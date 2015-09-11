@@ -105,7 +105,7 @@ namespace AsmDiff.NET
                 if (isHtml)
                 {
                     var htmlHelper = new HtmlHelper(theme, title);
-                    var html = htmlHelper.RenderHTML(s);
+                    var html = htmlHelper.RenderHTML(s, metaData);
                     using (var fileStream = File.Create(String.Format(@"{0}\AssemblyScanReport-{1}.html", Environment.CurrentDirectory, DateTime.Now.ToString("dd-MM-yyyy_HH-mm"))))
                     {
                         html.Seek(0, SeekOrigin.Begin);

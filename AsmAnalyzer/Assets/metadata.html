@@ -1,47 +1,42 @@
 ﻿<div class="meta-box">
+    <h2>Metadata</h2>
     <span class="btn">- [hide]</span>
 
-    <table class="meta-table">
+    <table id="meta-table" class="changes-table">
         <tbody>
+            <tr class="changes-table-header">
+                <td width="10%"></td>
+                <td width="45%">Source</td>
+                <td width="45%">Target</td>
+            </tr>
             <tr>
                 <td>Filter</td>
-                <td>{{FILTER}}</td>
+                <td colspan="2">{{FILTER}}</td>
             </tr>
             <tr>
-                <td>Pattern</td>
-                <td>{{PATTERN}}</td>
+                <td class="odd">Pattern</td>
+                <td colspan="2" class="odd">{{PATTERN}}</td>
             </tr>
             <tr>
-                <td>Source</td>
+                <td>Path</td>
                 <td>{{SOURCE}}</td>
-            </tr>
-            <tr><td colspan="2">Loaded</td></tr>
-            <tr>
-                <td colspan="2">
-                    <table id="source-assemblies-success"></table>
-                </td>
-            </tr>
-            <tr><td colspan="2">Errors</td></tr>
-            <tr>
-                <td colspan="2">
-                    <table id="source-assemblies-errors"></table>
-                </td>
-            </tr>
-            <tr>
-                <td>Target</td>
                 <td>{{TARGET}}</td>
             </tr>
-            <tr><td colspan="2">Loaded</td></tr>
             <tr>
-                <td colspan="2">
-                    <table id="target-assemblies-success"></table>
-                </td>
+                <td class="odd" colspan="3">Loaded <span class="btn-success">- [hide]</span></td>
             </tr>
-            <tr><td colspan="2">Errors</td></tr>
+            <tr class="asm-success">
+                <td class="left-asm-table"></td>
+                <td style="padding: 0;"><table id="source-assemblies-success" class="asm-table"></table></td>
+                <td style="padding: 0;"><table id="target-assemblies-success" class="asm-table"></table></td>
+            </tr>
             <tr>
-                <td colspan="2">
-                    <table id="target-assemblies-errors"></table>
-                </td>
+                <td colspan="3">Errors <span class="btn-errors">- [hide]</span></td>
+            </tr>
+            <tr class="asm-errors">
+                <td class="left-asm-table"></td>
+                <td style="padding: 0;"><table id="source-assemblies-errors" class="asm-table"></table></td>
+                <td style="padding: 0;"><table id="target-assemblies-errors" class="asm-table"></table></td>
             </tr>
         </tbody>
     </table>

@@ -31,10 +31,21 @@ namespace AsmAnalyzer.Util
             else
                 throw new FormatException("Unable to minify the provided CSS" + Environment.NewLine + String.Join("", minified.Errors));
 
-            BaseTemplate = LoadHtml(@"Assets\base.html", new TupleList<string,string>
+            //Read the main.js file and minify the javascript
+            var jsm = new YuiJsMinifier();
+            var jsFile = File.ReadAllLines(String.Format(@"{0}\Assets\main.js", Environment.CurrentDirectory));
+            var minJs = jsm.Minify(String.Join("", jsFile), false);
+            string mainJs = "";
+            if (minJs.Errors.Count == 0)
+                mainJs = minJs.MinifiedContent;
+
+
+            BaseTemplate = LoadHtml(@"Assets\base.html", new TupleList<string, string>
             {
                 {"{{CSS}}", themeCss},
-                {"{{TITLE}}", title}
+                {"{{JAVASCRIPT}}", mainJs},
+                {"{{TITLE}}", title},
+                {"{{DATE}}", DateTime.Now.ToString("dd-MM-yyyy HH:mm")}
             });
 
             TableTemplate = LoadHtml(@"Assets\table.html");
@@ -49,7 +60,7 @@ namespace AsmAnalyzer.Util
             {
                 foreach (var item in replace)
                 {
-                    htmlFile.Replace(item.Item1, item.Item2);
+                    htmlFile = htmlFile.Replace(item.Item1, item.Item2);
                 }
             }
             template.LoadHtml(String.Join("", htmlFile));
@@ -57,8 +68,12 @@ namespace AsmAnalyzer.Util
             return template;
         }
 
-        public Stream RenderHTML(ICollection<Result> results)
+        public Stream RenderHTML(ICollection<Result> results, MetaData metaData)
         {
+            RenderMetaData(metaData);
+            var body = BaseTemplate.DocumentNode.SelectSingleNode("//body");
+            body.ChildNodes.Add(MetaDataTemplate.DocumentNode);
+
             int i = 0;
             foreach (var r in results)
             {
@@ -79,7 +94,7 @@ namespace AsmAnalyzer.Util
                     i++;
                 }
                 i = 0;
-                BaseTemplate.DocumentNode.SelectSingleNode("//body").ChildNodes.Add(div);
+                body.ChildNodes.Add(div);
             }
 
             var stream = new MemoryStream();
@@ -95,22 +110,39 @@ namespace AsmAnalyzer.Util
                 {"{{FILTER}}", meta.Filter},
                 {"{{PATTERN}}", meta.Pattern},
                 {"{{SOURCE}}", meta.Source.Path},
-                {"{{TARGEt}}", meta.Target.Path}
+                {"{{TARGET}}", meta.Target.Path}
             });
 
             int i = 0;
             foreach (var srcAsm in meta.Source.AssemblySuccess)
             {
                 var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", srcAsm));
-                MetaDataTemplate.DocumentNode.SelectSingleNode("//*[@id='source-assemblies'").ChildNodes.Add(node);
+                MetaDataTemplate.GetElementbyId("source-assemblies-success").ChildNodes.Add(node);
                 i++;
             }
 
             i = 0;
-            foreach (var tarAsm in meta.Source.AssemblyErrors)
+            foreach (var srcAsm in meta.Source.AssemblyErrors)
+            {
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", srcAsm));
+                MetaDataTemplate.GetElementbyId("source-assemblies-errors").ChildNodes.Add(node);
+                i++;
+            }
+
+
+            i = 0;
+            foreach (var tarAsm in meta.Target.AssemblySuccess)
             {
                 var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", tarAsm));
-                MetaDataTemplate.DocumentNode.SelectSingleNode("//*[@id='target-assemblies'").ChildNodes.Add(node);
+                MetaDataTemplate.GetElementbyId("target-assemblies-success").ChildNodes.Add(node);
+                i++;
+            }
+
+            i = 0;
+            foreach (var tarAsm in meta.Target.AssemblyErrors)
+            {
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", tarAsm));
+                MetaDataTemplate.GetElementbyId("target-assemblies-errors").ChildNodes.Add(node);
                 i++;
             }
         }
