@@ -26,7 +26,7 @@ You can find the latest release under the release tab above.
 
 ## Reports
 The outputformat of the report are either in HTML or JSON, which you are able to specify from one of the command arguments.
-Be default there are 2 color themes, a dark and a light one.
+Be default there are two color themes, a dark and a light one.
 If neither of the default ones satisfies your needs, you are able to create your own theme.
 
 Examples of the HTML reports
@@ -66,6 +66,9 @@ Usage: AsmDiffNET [OPTIONS]
                              or a path to a CSS file.
                              Default options: light, dark
                              Default: `theme=light`
+
+      --title=VALUE          the given title will be displayed at the top of the HTML report
+                             
 ```
 
 ### Development

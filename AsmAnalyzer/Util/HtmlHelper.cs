@@ -15,10 +15,11 @@ namespace AsmAnalyzer.Util
 {
     public class HtmlHelper
     {
-        public HtmlDocument HtmlFile { get; set; }
+        public HtmlDocument BaseTemplate { get; set; }
         public HtmlDocument TableTemplate { get; set; }
+        public HtmlDocument MetaDataTemplate { get; set; }
 
-        public HtmlHelper(string theme)
+        public HtmlHelper(string theme, string title)
         {
             //Read theme file and minify the CSS
             var ycm = new YuiCssMinifier();
@@ -30,20 +31,49 @@ namespace AsmAnalyzer.Util
             else
                 throw new FormatException("Unable to minify the provided CSS" + Environment.NewLine + String.Join("", minified.Errors));
 
-            var baseFile = File.ReadAllLines(String.Format(@"{0}\Assets\base.html", Environment.CurrentDirectory));
-            string baseHtml = String.Join("", baseFile).Replace("{{DATE}}", DateTime.Now.ToString("dd-MM-yyyy HH:mm"));
-            baseHtml = baseHtml.Replace("{{CSS}}", themeCss);
+            //Read the main.js file and minify the javascript
+            var jsm = new YuiJsMinifier();
+            var jsFile = File.ReadAllLines(String.Format(@"{0}\Assets\main.js", Environment.CurrentDirectory));
+            var minJs = jsm.Minify(String.Join("", jsFile), false);
+            string mainJs = "";
+            if (minJs.Errors.Count == 0)
+                mainJs = minJs.MinifiedContent;
 
-            TableTemplate = new HtmlDocument();
-            var tableFile = File.ReadAllLines(String.Format(@"{0}\Assets\table.html", Environment.CurrentDirectory));
-            TableTemplate.LoadHtml(String.Join("", tableFile));
 
-            HtmlFile = new HtmlDocument();
-            HtmlFile.LoadHtml(baseHtml);
+            BaseTemplate = LoadHtml(@"Assets\base.html", new TupleList<string, string>
+            {
+                {"{{CSS}}", themeCss},
+                {"{{JAVASCRIPT}}", mainJs},
+                {"{{TITLE}}", title},
+                {"{{DATE}}", DateTime.Now.ToString("dd-MM-yyyy HH:mm")}
+            });
+
+            TableTemplate = LoadHtml(@"Assets\table.html");
+            MetaDataTemplate  = LoadHtml(@"Assets\metadata.html");
         }
 
-        public Stream RenderHTML(ICollection<Result> results)
+        private HtmlDocument LoadHtml(string path, TupleList<string, string> replace = null)
         {
+            var template = new HtmlDocument();
+            var htmlFile = String.Join("", File.ReadAllLines(String.Format(@"{0}\{1}", Environment.CurrentDirectory, path)));
+            if(replace != null)
+            {
+                foreach (var item in replace)
+                {
+                    htmlFile = htmlFile.Replace(item.Item1, item.Item2);
+                }
+            }
+            template.LoadHtml(String.Join("", htmlFile));
+
+            return template;
+        }
+
+        public Stream RenderHTML(ICollection<Result> results, MetaData metaData)
+        {
+            RenderMetaData(metaData);
+            var body = BaseTemplate.DocumentNode.SelectSingleNode("//body");
+            body.ChildNodes.Add(MetaDataTemplate.DocumentNode);
+
             int i = 0;
             foreach (var r in results)
             {
@@ -64,13 +94,59 @@ namespace AsmAnalyzer.Util
                     i++;
                 }
                 i = 0;
-                HtmlFile.DocumentNode.SelectSingleNode("//body").ChildNodes.Add(div);
+                body.ChildNodes.Add(div);
             }
 
             var stream = new MemoryStream();
-            HtmlFile.Save(stream);
+            BaseTemplate.Save(stream);
 
             return stream;
+        }
+
+        public void RenderMetaData(MetaData meta)
+        {
+            MetaDataTemplate = LoadHtml(@"Assets\metadata.html", new TupleList<string, string>
+            {
+                {"{{FILTER}}", meta.Filter},
+                {"{{PATTERN}}", meta.Pattern},
+                {"{{FLAGS}}", meta.Flags},
+                {"{{SOURCE}}", meta.Source.Path},
+                {"{{TARGET}}", meta.Target.Path},
+                {"{{CMDARGS}}", meta.CommandArguments}
+            });
+
+            int i = 0;
+            foreach (var srcAsm in meta.Source.AssemblySuccess)
+            {
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", srcAsm));
+                MetaDataTemplate.GetElementbyId("source-assemblies-success").ChildNodes.Add(node);
+                i++;
+            }
+
+            i = 1;
+            foreach (var srcAsm in meta.Source.AssemblyErrors)
+            {
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", srcAsm));
+                MetaDataTemplate.GetElementbyId("source-assemblies-errors").ChildNodes.Add(node);
+                i++;
+            }
+
+
+            i = 0;
+            foreach (var tarAsm in meta.Target.AssemblySuccess)
+            {
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", tarAsm));
+                MetaDataTemplate.GetElementbyId("target-assemblies-success").ChildNodes.Add(node);
+                i++;
+            }
+
+            i = 1;
+            foreach (var tarAsm in meta.Target.AssemblyErrors)
+            {
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", tarAsm));
+                MetaDataTemplate.GetElementbyId("target-assemblies-errors").ChildNodes.Add(node);
+                i++;
+            }
         }
     }
 }
