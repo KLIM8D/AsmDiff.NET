@@ -94,6 +94,8 @@ namespace AsmDiff.NET
                 {
                     Pattern = pattern,
                     Filter = filter,
+                    Flags = GetFlagsString(flags),
+                    CommandArguments = String.Join(" ", args),
                     Source = new AssemblyMetaData { Path = source, AssemblyErrors = new List<string>(), AssemblySuccess = new List<string>() },
                     Target = new AssemblyMetaData { Path = target, AssemblyErrors = new List<string>(), AssemblySuccess = new List<string>() }
                 };
@@ -184,6 +186,24 @@ namespace AsmDiff.NET
                 r = r | Analyzer.AnalyzerFlags.Changes;
             if (flags.Contains("D"))
                 r = r | Analyzer.AnalyzerFlags.Deletion;
+
+            return r;
+        }
+
+        static string GetFlagsString(string flags)
+        {
+            if (String.IsNullOrEmpty(flags))
+                return "Changes Deletions";
+
+            flags = flags.ToUpperInvariant();
+            string r = "";
+
+            if (flags.Contains("A"))
+                r += "Additions ";
+            if (flags.Contains("C"))
+                r += "Changes ";
+            if (flags.Contains("D"))
+                r += "Deletions ";
 
             return r;
         }

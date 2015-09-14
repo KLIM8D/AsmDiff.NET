@@ -3,7 +3,12 @@
         triggertable(this, $(this).parent().children(".changes-table").children("tbody"), false);
     });
     $(".meta-box").on("click", ".btn", function() {
-        triggertable(this, $(this).parent().children(".changes-table").children("tbody"), false);
+        var e = $(this).parent().children(".changes-table").children("tbody");
+        triggertable(this, e, false);
+        var btnSuccess = $(".btn-success").first();
+        var btnErrors = $(".btn-errors").first();
+        collapse(btnSuccess, $(".asm-success"));
+        collapse(btnErrors, $(".asm-errors"));
     });
 
     $(".meta-box").on("click", ".btn-success", function () {
@@ -16,10 +21,10 @@
 
     $(".meta-box").ready(function () {
         var e = $(".meta-box").children(".btn").first();
-        //the 2 following does not trigger
-        triggertable(e, $(".asm-success"), true);
-        triggertable(e, $(".asm-errors"), true);
-        triggertable(e, e.parent().children(".changes-table").children("tbody"), false);
+        var btnSuccess = $(".btn-success").first();
+        var btnErrors = $(".btn-errors").first();
+        collapse(btnSuccess, $(".asm-success"));
+        collapse(btnErrors, $(".asm-errors"));
     });
 });
 
@@ -42,4 +47,13 @@ function triggertable(e, table, isTr) {
         table.addClass("collapsed");
         myTRs.hide();
     }
+};
+
+function collapse(btn,table) {
+    var count;
+    var asmTables = table.find(".asm-table").children("tbody").children("tr");
+    count = asmTables.length / 2;
+    btn.text("+ [" + count + " entries]");
+    table.addClass("collapsed");
+    table.hide();
 };

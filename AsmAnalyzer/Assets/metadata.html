@@ -10,12 +10,16 @@
                 <td width="45%">Target</td>
             </tr>
             <tr>
-                <td>Filter</td>
-                <td colspan="2">{{FILTER}}</td>
+                <td class="odd">Filter</td>
+                <td class="odd" colspan="2">{{FILTER}}</td>
             </tr>
             <tr>
-                <td class="odd">Pattern</td>
-                <td colspan="2" class="odd">{{PATTERN}}</td>
+                <td>Pattern</td>
+                <td colspan="2">{{PATTERN}}</td>
+            </tr>
+            <tr>
+                <td class="odd">Flags</td>
+                <td colspan="2" class="odd">{{FLAGS}}</td>
             </tr>
             <tr>
                 <td>Path</td>
@@ -23,20 +27,24 @@
                 <td>{{TARGET}}</td>
             </tr>
             <tr>
-                <td class="odd" colspan="3">Loaded <span class="btn-success">- [hide]</span></td>
+                <td colspan="3" class="odd">Loaded <span class="btn-success">- [hide]</span></td>
             </tr>
             <tr class="asm-success">
                 <td class="left-asm-table"></td>
-                <td style="padding: 0;"><table id="source-assemblies-success" class="asm-table"></table></td>
-                <td style="padding: 0;"><table id="target-assemblies-success" class="asm-table"></table></td>
+                <td style="padding: 0;vertical-align:top"><table id="source-assemblies-success" class="asm-table"></table></td>
+                <td style="padding: 0;vertical-align:top"><table id="target-assemblies-success" class="asm-table"></table></td>
             </tr>
             <tr>
                 <td colspan="3">Errors <span class="btn-errors">- [hide]</span></td>
             </tr>
             <tr class="asm-errors">
                 <td class="left-asm-table"></td>
-                <td style="padding: 0;"><table id="source-assemblies-errors" class="asm-table"></table></td>
-                <td style="padding: 0;"><table id="target-assemblies-errors" class="asm-table"></table></td>
+                <td style="padding: 0;vertical-align:top"><table id="source-assemblies-errors" class="asm-table"></table></td>
+                <td style="padding: 0;vertical-align:top"><table id="target-assemblies-errors" class="asm-table"></table></td>
+            </tr>
+            <tr>
+                <td class="odd">Command arguments</td>
+                <td class="odd" colspan="2">{{CMDARGS}}</td>
             </tr>
         </tbody>
     </table>

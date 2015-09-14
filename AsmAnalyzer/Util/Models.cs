@@ -13,6 +13,8 @@ namespace AsmAnalyzer.Util
         public AssemblyMetaData Target { get; set; }
         public string Filter { get; set; }
         public string Pattern { get; set; }
+        public string Flags { get; set; }
+        public string CommandArguments { get; set; }
     }
 
     public class AssemblyMetaData

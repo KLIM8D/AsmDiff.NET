@@ -109,8 +109,10 @@ namespace AsmAnalyzer.Util
             {
                 {"{{FILTER}}", meta.Filter},
                 {"{{PATTERN}}", meta.Pattern},
+                {"{{FLAGS}}", meta.Flags},
                 {"{{SOURCE}}", meta.Source.Path},
-                {"{{TARGET}}", meta.Target.Path}
+                {"{{TARGET}}", meta.Target.Path},
+                {"{{CMDARGS}}", meta.CommandArguments}
             });
 
             int i = 0;
@@ -121,7 +123,7 @@ namespace AsmAnalyzer.Util
                 i++;
             }
 
-            i = 0;
+            i = 1;
             foreach (var srcAsm in meta.Source.AssemblyErrors)
             {
                 var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", srcAsm));
@@ -138,7 +140,7 @@ namespace AsmAnalyzer.Util
                 i++;
             }
 
-            i = 0;
+            i = 1;
             foreach (var tarAsm in meta.Target.AssemblyErrors)
             {
                 var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", tarAsm));

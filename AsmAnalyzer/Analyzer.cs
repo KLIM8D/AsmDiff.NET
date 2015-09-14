@@ -36,10 +36,7 @@ namespace AsmAnalyzer
     /// xxHash algorithm chosen based upon https://github.com/Cyan4973/xxHash (https://github.com/noricube/xxHashSharp)
     ///                                and http://fastcompression.blogspot.dk/2012/04/selecting-checksum-algorithm.html
     /// 
-    /// Changes:
-    /// 
     /// </summary>
-    /// <version>1.0</version>
     public sealed class Analyzer
     {
         [Flags]
