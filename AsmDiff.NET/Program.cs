@@ -10,7 +10,9 @@ using AsmAnalyzer.Util;
 using NDesk.Options;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
+using System.IO.Pipes;
 using System.Text.RegularExpressions;
 
 namespace AsmDiff.NET
@@ -29,6 +31,8 @@ namespace AsmDiff.NET
             string flags   = "";
             string theme   = "light";
             string title   = "AsmDiff.NET report";
+            string filename = "";
+            UInt16 maxdepth = 1;
 
             bool isHtml   = true;
             bool showHelp = false;
@@ -49,7 +53,9 @@ namespace AsmDiff.NET
                 {"theme=", "specify either a filename within Assets\\Themes or a path to a CSS file. " + Environment.NewLine +
                             "Default options: light, dark" + Environment.NewLine +
                             "Default: `theme=light`", th => theme = th},
-                {"title=", "the given title will be displayed at the top of the HTML report", t => { if(!String.IsNullOrEmpty(t)) title = t; } }
+                {"title=", "the given title will be displayed at the top of the HTML report", t => { if(!String.IsNullOrEmpty(t)) title = t; } },
+                {"maxdepth=", "descend at most levels (a non-negative integer) levels of directories below the current", m => { if(UInt16.TryParse(m, out maxdepth)); } },
+                {"filename=", "the name the tool will use for naming the result file, excluding the file extension", f => { if(!String.IsNullOrEmpty(f)) filename = f; } }
             };
 
 
@@ -99,7 +105,7 @@ namespace AsmDiff.NET
                     Source = new AssemblyMetaData { Path = source, AssemblyErrors = new List<string>(), AssemblySuccess = new List<string>() },
                     Target = new AssemblyMetaData { Path = target, AssemblyErrors = new List<string>(), AssemblySuccess = new List<string>() }
                 };
-                var analyzer = new Analyzer { Flags = fl };
+                var analyzer = new Analyzer { Flags = fl, MaxDepth = maxdepth };
                 var s = analyzer.Invoke(@source, @target, @filter, regex, metaData);
 
                 #region RenderOutput
@@ -108,34 +114,39 @@ namespace AsmDiff.NET
                 {
                     var htmlHelper = new HtmlHelper(theme, title);
                     var html = htmlHelper.RenderHTML(s, metaData);
-                    using (var fileStream = File.Create(String.Format(@"{0}\AssemblyScanReport-{1}.html", Environment.CurrentDirectory, DateTime.Now.ToString("dd-MM-yyyy_HH-mm"))))
+                    string filepath = String.Format(@"{0}\{1}.html", Environment.CurrentDirectory, !String.IsNullOrEmpty(filename) ? filename : ("AssemblyScanReport-" + DateTime.Now.ToString("dd-MM-yyyy_HH-mm")));
+                    using (var fileStream = File.Create(filepath))
                     {
                         html.Seek(0, SeekOrigin.Begin);
                         html.CopyTo(fileStream);
                     }
+
+                    SendMessageAsync(filename, filepath);
                 }
                 else
                 {
                     var json = JsonHelper.SerializeJson<ICollection<Result>>(s);
-                    string fileName = String.Format(String.Format(@"{0}\AssemblyScanReport-{1}.json", Environment.CurrentDirectory, DateTime.Now.ToString("dd-MM-yyyy_HH-mm")));
-                    File.WriteAllText(fileName, json);
+                    string filepath = String.Format(String.Format(@"{0}\{1}.json", Environment.CurrentDirectory, !String.IsNullOrEmpty(filename) ? filename : ("AssemblyScanReport-" + DateTime.Now.ToString("dd-MM-yyyy_HH-mm"))));
+                    File.WriteAllText(filepath, json);
+
+                    SendMessageAsync(filename, filepath);
                 }
                 #endregion
             }
             catch (OptionException e)
             {
-                Console.Write("AsmDiff.NET: ");
-                Console.WriteLine(e.Message);
-                Console.WriteLine("Try 'AsmDiffNET --help' for more information.");
-                
+                Console.Error.Write("AsmDiff.NET: ");
+                Console.Error.WriteLine(e.Message);
+                Console.Error.WriteLine("Try 'AsmDiffNET --help' for more information.");
+
 #if DEBUG
-                Console.ReadLine();
+                //Console.ReadLine();
 #endif
                 return;
             }
             catch (Exception e)
             {
-                Console.Write("AsmDiff.NET: An unknown error occurred. Please see the CrashDump file for further information.");
+                Console.Error.Write("AsmDiff.NET: An unknown error occurred. Please see the CrashDump file for further information.");
                 string fileName = String.Format(String.Format(@"{0}\CrashDump-{1}.txt", Environment.CurrentDirectory, DateTime.Now.ToString("dd-MM-yyyy_HH-mm")));
                 File.WriteAllText(fileName, e.ToString());
             }
@@ -206,6 +217,25 @@ namespace AsmDiff.NET
                 r += "Deletions ";
 
             return r;
+        }
+
+        static async void SendMessageAsync(string pipeName, string message)
+        {
+            try
+            {
+                using (var pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.Out, PipeOptions.Asynchronous))
+                using (var stream = new StreamWriter(pipe))
+                {
+                    pipe.Connect(2000);
+
+                    // write the message to the pipe stream 
+                    await stream.WriteAsync(message);
+                }
+            }
+            catch (Exception)
+            {
+                Console.Error.WriteLine("Error connecting to the pipe: " + pipeName);
+            }
         }
     }
 }

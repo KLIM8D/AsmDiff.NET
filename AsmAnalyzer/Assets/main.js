@@ -39,7 +39,7 @@ function triggertable(e, table, isTr) {
         var count;
         if (isTr) {
             var asmTables = table.find(".asm-table").children("tbody").children("tr");
-            count = asmTables.length / 2;
+            count = Math.round(asmTables.length / 2);
         } else {
             count = myTRs.length > 0 ? myTRs.length - 1 : 0;
         }
@@ -52,7 +52,7 @@ function triggertable(e, table, isTr) {
 function collapse(btn,table) {
     var count;
     var asmTables = table.find(".asm-table").children("tbody").children("tr");
-    count = asmTables.length / 2;
+    count = Math.round(asmTables.length / 2);
     btn.text("+ [" + count + " entries]");
     table.addClass("collapsed");
     table.hide();

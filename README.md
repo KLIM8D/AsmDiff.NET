@@ -68,6 +68,12 @@ Usage: AsmDiffNET [OPTIONS]
                              Default: `theme=light`
 
       --title=VALUE          the given title will be displayed at the top of the HTML report
+
+      --maxdepth=VALUE       descend at most levels (a non-negative integer) levels of directories below the current
+
+      --filename=VALUE       the name the tool will use for naming the result file, excluding the file extension.
+                             The filename is used as the name for the namedpipe as well.
+
                              
 ```
 

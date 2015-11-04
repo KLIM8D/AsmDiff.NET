@@ -49,6 +49,7 @@ namespace AsmAnalyzer
         }
 
         public AnalyzerFlags Flags { get; set; }
+        public UInt16 MaxDepth { get; set; }
 
         enum ResultType
         {
@@ -108,25 +109,53 @@ namespace AsmAnalyzer
             var asmPaths = new List<string>();
             if (path.Contains(".dll"))
             {
-                sandbox.LoadAssembly(path, domainName, filter);
-                asmPaths.Add(path);
+                try
+                {
+                    sandbox.LoadAssembly(path, domainName, filter);
+                    asmPaths.Add(path);
+                }
+                catch (FileLoadException)
+                {
+
+                }
             }
             else
             {
+                var directories = GetDirectories(path, 0);
                 if (regex != null)
                 {
-                    foreach (var dll in Directory.GetFiles(path, "*.dll").Where(x => regex.IsMatch(x)))
+                    foreach (var dir in directories)
                     {
-                        sandbox.LoadAssembly(dll, domainName, filter);
-                        asmPaths.Add(dll);
+                        foreach (var dll in Directory.GetFiles(dir, "*.dll").Where(x => regex.IsMatch(x)))
+                        {
+                            try
+                            {
+                                sandbox.LoadAssembly(dll, domainName, filter);
+                                asmPaths.Add(dll);
+                            }
+                            catch (FileLoadException)
+                            {
+
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    foreach (var dll in Directory.GetFiles(path, "*.dll"))
+                    foreach (var dir in directories)
                     {
-                        sandbox.LoadAssembly(dll, domainName, filter);
-                        asmPaths.Add(dll);
+                        foreach (var dll in Directory.GetFiles(dir, "*.dll"))
+                        {
+                            try
+                            {
+                                sandbox.LoadAssembly(dll, domainName, filter);
+                                asmPaths.Add(dll);
+                            }
+                            catch (FileLoadException)
+                            {
+
+                            }
+                        }
                     }
                 }
             }
@@ -330,6 +359,34 @@ namespace AsmAnalyzer
             return returnVal.Where(x => x.Items.Count != 0).ToList();
         }
 
+        /// <summary>
+        /// Recursively goes through a directorys subdirectories until the current depth is equal or above the MaxDepth
+        /// </summary>
+        /// <param name="path">Path to the root- or sub-directory</param>
+        /// <param name="depth">Current depth, root = 0</param>
+        /// <returns>A list of paths to all directories within the given path</returns>
+        private IEnumerable<string> GetDirectories(string path, ushort depth)
+        {
+            if (depth >= MaxDepth)
+                return null;
+
+            var result = new List<string>();
+            foreach (var dir in Directory.GetDirectories(path))
+            {
+                result.Add(dir);
+            }
+
+            depth = Convert.ToUInt16(depth + 1);
+            foreach (var subDir in result)
+            {
+                var tmpResult = GetDirectories(subDir, depth);
+                if (tmpResult != null)
+                    result.AddRange(tmpResult);
+            }
+
+            return result;
+        }
+
         private static ResultItem NewResultItem(CommonProperty before, CommonProperty after, ResultType type)
         {
             var r = new ResultItem
@@ -360,17 +417,17 @@ namespace AsmAnalyzer
 
             string content = sb.ToString();
 
-            // convert the input string to a byte array and compute the hash.
+            // convert the input string to a byte array and compute the hash
             byte[] data = Encoding.Default.GetBytes(content);
             uint hash = xxHash.CalculateHash(data);
 
-            // return the hexadecimal string.
+            // return the hexadecimal string
             return String.Format("{0:X}", hash);
         }
 
         private bool CompareChecksum(string source, string target)
         {
-            // create a StringComparer an compare the hashes.
+            // create a StringComparer and compare the hashes
             StringComparer comparer = StringComparer.Ordinal;
 
             return (0 == comparer.Compare(source, target)) ? true : false;

@@ -116,9 +116,11 @@ namespace AsmAnalyzer.Util
             });
 
             int i = 0;
+            FileInfo fileInfo;
             foreach (var srcAsm in meta.Source.AssemblySuccess)
             {
-                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", srcAsm));
+                fileInfo = new FileInfo(srcAsm);
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", fileInfo.Name));
                 MetaDataTemplate.GetElementbyId("source-assemblies-success").ChildNodes.Add(node);
                 i++;
             }
@@ -126,7 +128,8 @@ namespace AsmAnalyzer.Util
             i = 1;
             foreach (var srcAsm in meta.Source.AssemblyErrors)
             {
-                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", srcAsm));
+                fileInfo = new FileInfo(srcAsm);
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", fileInfo.Name));
                 MetaDataTemplate.GetElementbyId("source-assemblies-errors").ChildNodes.Add(node);
                 i++;
             }
@@ -135,7 +138,8 @@ namespace AsmAnalyzer.Util
             i = 0;
             foreach (var tarAsm in meta.Target.AssemblySuccess)
             {
-                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", tarAsm));
+                fileInfo = new FileInfo(tarAsm);
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", fileInfo.Name));
                 MetaDataTemplate.GetElementbyId("target-assemblies-success").ChildNodes.Add(node);
                 i++;
             }
@@ -143,7 +147,8 @@ namespace AsmAnalyzer.Util
             i = 1;
             foreach (var tarAsm in meta.Target.AssemblyErrors)
             {
-                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", tarAsm));
+                fileInfo = new FileInfo(tarAsm);
+                var node = HtmlNode.CreateNode(String.Format("<tr class=\"{0} child\"><td>{1}</td></tr>", i % 2 == 0 ? "even" : "odd", fileInfo.Name));
                 MetaDataTemplate.GetElementbyId("target-assemblies-errors").ChildNodes.Add(node);
                 i++;
             }
